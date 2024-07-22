@@ -1,2 +1,3 @@
 # Popgen_comparions_with_diff_loci
-all scripts necessary to replicate results
+
+ Scripts are organized into mapping and SNP calling and plotting directories. 
