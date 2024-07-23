@@ -1,4 +1,10 @@
-w##For cluster files, use the below lines to make sure packages are installed and loaded
+#################################################################
+#########Script orginally written by jacob b. landis#############
+#########last modified by joshua m. felton 7/23/24###############
+#################################################################
+
+##use the below lines to make sure packages are installed and loaded
+
 #if (!require("pacman")) install.packages("pacman")
 #pacman::p_load(data.table, ggplot2, ggpmisc)
 #if (!requireNamespace("BiocManager", quietly = TRUE))
