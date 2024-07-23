@@ -10,17 +10,15 @@ mkdir well_supported
 mkdir larger_than70_nodes
 
 #reroot trees
-for file in primula/*.support
+for file in ./*.support
 do
 	name=`basename $file .treefile`
 	echo "rooting tree for $name"
 	gotree reroot midpoint -i $file -o $name.rooted.treefile.tre 
 done
 
-mv Primula/*.rooted.treefile.tre new_root/
-
 #collapse weak nodes
-for file in new_root/*.treefile.tre
+for file in ./*.treefile.tre
 do
 	name=`basename $file .treefile.tre`
 	echo "Collapsing weakly supported nodes for $name"
