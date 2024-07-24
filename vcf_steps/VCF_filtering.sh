@@ -1,7 +1,6 @@
-#######################################
-###script created by jacob b. landis###
-###last modifed by joshua m. felton####
-#######################################
+#########################################################
+###script created and last modified by jacob b. landis###
+#########################################################
 
 /local/workdir/jbl256/Installed_programs/vcftools-0.1.16/bin/vcftools --gzvcf ../GVCF/Corylus_Singlecopy_combined_SNP_calls.vcf.gz --max-missing 0.5 --min-alleles 2 --max-alleles 2 --maf 0.05 --mac 3 --recode --recode-INFO-all --out Corylus_singlecopy_initial_filtering
 
