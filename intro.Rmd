@@ -1,0 +1,110 @@
+---
+title: "Popgen_comparions_with_diff_loci"
+author: "Josh"
+date: "2024-08-29"
+output: html_document
+---
+
+# Abstract <br>
+
+In this study, we assess the congruence of reduced representation approaches, such as targeted sequencing and ultra-conserved elements (UCEs), with whole-genome resequencing (WGR) in population genomic and phylogenomic analyses. Our findings reveal that reduced representation methods often yield incongruent results compared to WGR, particularly in clades characterized by recent radiations and incomplete lineage sorting. Single-copy loci, especially when combined with supercontigs, demonstrated a closer alignment with WGR datasets, evidenced by higher retention of SNPs after linkage disequilibrium (LD) filtering. However, the degree of SNP retention varied across taxa, underscoring the influence of LD and dataset composition on genomic analyses.
+
+We also explored the impact of dataset choice on population structure inference, noting that approaches like Principal Component Analysis (PCA) exhibited greater congruence across different datasets compared to other metrics such as bootstrap support and K estimates. While WGR remains resource-intensive, its comprehensive coverage makes it invaluable for detecting genetic variation and understanding evolutionary processes in complex clades. In contrast, UCEs, despite their utility in large-scale phylogenomic studies, showed the least congruence with WGR, highlighting their limitations in capturing the full spectrum of genomic variation.
+
+Our study underscores the importance of careful loci selection and the need for ongoing research into the implications of different marker types for genomic studies. As sequencing technologies advance and costs decline, WGR is likely to play an increasingly central role in both population genomic and phylogenomic research, providing critical insights into both micro- and macroevolutionary processes.
+
+### mapping script
+***
+
+```{bash, eval = FALSE}
+mkdir SAM_files
+mkdir bam_files
+mkdir sorted_bam_files
+mkdir Duplicates_marked
+mkdir GVCF
+mkdir Completed_BAMs_after_SNPs
+mkdir angsd
+
+#reference file
+GENOME=Begonia_BUSCOreference.fasta
+
+#to index a fasta file
+#/local/workdir/jbl256/Installed_programs/bwa-mem2-2.2.1_x64-linux/bwa-mem2 index Atriplex_hortensis.fasta
+
+
+#Read group information starts with "@RG
+#ID: is unique identifier of the samples, for now doing the sample name and the barcode info
+#SM: is the sample name
+#PL: is the sequencing equipment, in almost all cases this will be Illumina
+#PU: is the run identifier, the lane, followed by the specific barcode of the sample
+#LB: is the library count
+
+#example for one sample at a time
+#/local/workdir/jbl256/Installed_programs/bwa-mem2-2.2.1_x64-linux/bwa-mem2 mem -t 6 -R "@RG\tID:Sp100_SRR7548958_reseq\tSM:Sp100_SRR7548958\tPL:IlluminaSRA\tPU:HTNMKDSXX\tLB:duckweed_reseq" /local/workdir/jbl256/PLSCI6940_class_project/Sesamum_indicum_jbl/genomes/GCA_000512975.1_S_indicum_v1.0_genomic.fasta cleaned_reads/Spirodela_polyrhiza_Sp100_SRR7548958.R1.fastq.gz cleaned_reads/Spirodela_polyrhiza_Sp100_SRR7548958.R2.fastq.gz > SAM_files/Spirodela_polyrhiza_Sp100_SRR7548958.sam
+
+#loop; use this for the lab server
+for file in ../cleaned_reads/*R1.fastq.gz
+do
+	name=`basename $file .R1.fastq.gz`
+	echo "mapping $name to reference"
+	forward=$name".R1.fastq.gz"
+	reverse=$name".R2.fastq.gz"
+	design=`basename $file .R1.fastq.gz`
+	#perform the alignment
+	/local/workdir/jbl256/Installed_programs/bwa-mem2-2.2.1_x64-linux/bwa-mem2 mem -t 8 -R "@RG\tID:$design.wgs\tSM:$design\tPL:IlluminaSRA\tPU:HTNMKDSXX\tLB:WGS_SRA" ../genomes/$GENOME ../cleaned_reads/$forward ../cleaned_reads/$reverse | /local/workdir/jbl256/Installed_programs/samtools-1.19.2/samtools view -S -b --threads 8 > bam_files/$name.bam
+done
+
+
+#Sort BAM for SNP calling
+for file in bam_files/*.bam
+do
+	echo "Sort $file"
+	name=`basename $file .bam`
+	readid=$name
+	/local/workdir/jbl256/Installed_programs/samtools-1.19.2/samtools sort --threads 8 -o sorted_bam_files/$readid.bam $file
+	rm $file
+done
+
+#create sequence dictionary in Picard (needed for GATK analysis), need to already have the genome indexed with BWA
+
+for file in sorted_bam_files/*.bam
+do
+	echo "Marking duplicates in $file "
+	name=`basename $file .bam`
+	/local/workdir/jbl256/Installed_programs/gatk-4.2.3.0/gatk --java-options "-Xmx10G" MarkDuplicates -I $file -O Duplicates_marked/$name.duplicates.bam -M Duplicates_marked/$name.dup_metrics.txt
+	rm $file
+done
+
+
+#index bam files before calling SNPs
+for file in Duplicates_marked/*.bam
+do
+	echo "Indexing $file "
+	name=`basename $file .bam`
+	/local/workdir/jbl256/Installed_programs/samtools-1.19.2/samtools index $file
+done
+
+#Use HaplotypeCaller for each sample
+for file in Duplicates_marked/*.bam
+#do
+	echo "Calling SNPs on $file "
+	name=`basename $file .bam`
+	/local/workdir/jbl256/Installed_programs/gatk-4.2.3.0/gatk --java-options "-Xmx10G" HaplotypeCaller -R ../genomes/$GENOME -I $file -O GVCF/$name.g.vcf.gz -ERC GVCF
+	mv $file Completed_BAMs_after_SNPs
+	mv $file.bai Completed_BAMs_after_SNPs
+done
+
+cd angsd
+
+for file in ../Completed_BAMs_after_SNPs/*bam
+do
+	name=`basename $file .bam`
+	echo "Running angsd on $name to calculate genome wide heterozygostiy"
+	/local/workdir/jbl256/Installed_programs/angsd/angsd -i $file -anc ../../genomes/$GENOME -dosaf 1 -gl 1 -minMapQ 30 -minQ 20
+	/local/workdir/jbl256/Installed_programs/angsd/misc/realSFS angsdput.saf.idx > $name.est.ml
+	rm angsdput.saf.pos.gz
+	rm angsdput.saf.idx
+	rm angsdput.saf.gz
+	rm angsdput.arg
+done
+```
