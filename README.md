@@ -1,14 +1,11 @@
----
-editor_options: 
-  markdown: 
-    wrap: 72
----
-
 # The power to resolve relationships: identifying incongruence and precision of reduced representation and genome-wide data in phylogenomics and population genomics
 
 [doi here](https://doi.org/)
 
 ###### Corresponding Authors
+
+If you run into problems with the code, please open an issue on github here: https://github.com/Specht-Lab/reduced-representation_vs_resqeuencing
+
 
 ```         
 Name: Joshua Felton
@@ -59,8 +56,8 @@ replicate our analyses.
 2. [figures](#figures)
 3. [code](#code)
   1. [shell](#shell_scripts)
-  2. [Sub paragraph](#subparagraph1)
-  3. [Sub paragraph](#subparagraph1)
+  2. [R](#R_scripts)
+4. [assoc. files (data)](#data)
 
 ## table information <a name="table_information"></a>
 
@@ -117,7 +114,7 @@ reciprocal blast between BUSCO and single copy reference to remove BUSCO hits fr
 
 ##### bash/BWA_and_Haplotype.sh
 
-mapping, heterozgosity and snp calling pipeline. Use for each reference generated. 
+mapping, heterozgosity and snp calling pipeline. Use for each reference generated. Do not forget to index and create a dictonary for your reference. 
 
 ##### bash/collapse_nodes.sh
 
@@ -131,70 +128,51 @@ combine gVCFs from `BWA_and_Haplotype.sh` **note tmp option to select location o
 
 extracts longest supercontig (or contig) and then creates a concatinated reference. 
 
-##### bash/extract_longest_supercontig.sh
+##### bash/fastp_universal.sh
+
+clean reads after downloading from a nucelotide archive
+
+##### bash/genome_thinning.sh
+
+script used to thin genome VCFs randomly to 100,000 SNPs for better computational performance
+
+##### bash/HybPiper_steps.sh
 
 extracts longest supercontig (or contig) and then creates a concatinated reference. 
 
-##### bash/extract_longest_supercontig.sh
+##### bash/mpileup_snp_calling.sh
 
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
+mPileup snp calling steps 
 
-##### bash/extract_longest_supercontig.sh
+##### bash/orthofinder.sh
 
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
+orthofinder settings
 
-##### bash/extract_longest_supercontig.sh
+##### bash/rax-ml.sh
 
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
+raxml settings
 
-##### bash/extract_longest_supercontig.sh
+##### bash/report_heterozygosity.sh
 
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
+calculates from `est.ml` files the proportion of heterozygous sites
 
-##### bash/extract_longest_supercontig.sh
+##### bash/rooting.sh
 
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
+roots trees either with midpoint or an outgroup.
 
-##### bash/extract_longest_supercontig.sh
+##### bash/Trinity.sh
 
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
+script and settings to run Trinity for single copy pipeline
 
-##### bash/extract_longest_supercontig.sh
+##### bash/VCFtools_filtering.sh
 
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
+intial filtering with a LD pruning step before summary and downstream files (final VCF, fasta & STRUCTURE file) 
 
-##### bash/extract_longest_supercontig.sh
+##### bash/VCFtools_thin_filtering.sh
 
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
+script for thinning genome VCF files randomly down to 100,000 SNPs. Useful if running into computional problems with genome-wide datasets
 
-##### bash/extract_longest_supercontig.sh
-
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
-
-##### bash/extract_longest_supercontig.sh
-
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
-
-##### bash/extract_longest_supercontig.sh
-
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
-
-##### bash/extract_longest_supercontig.sh
-
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
-
-##### bash/extract_longest_supercontig.sh
-
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
-
-##### bash/extract_longest_supercontig.sh
-
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
-
-##### bash/extract_longest_supercontig.sh
-
-extracts longest supercontig (or contig) and then creates a concatinated reference. 
-
+### R_scripts <a name="R_scripts"></a>
 
 ##### R/compare-and-Cophylo.R.R
 
@@ -208,7 +186,6 @@ loop to run compare phylo across downsampled replicates
 ##### R/fig_1_phylomaker.R
 
 script to reproduce the phylogeny in figure 1. 
-
 
 ##### R/heterozygosity_plots.R
 
@@ -249,3 +226,61 @@ script to reproduce figure S3
 ##### R/venn_diagram_snp_filtering.R
 
 script to reproduce figure S1
+
+## assoc. files (data) <a name="data"></a>
+
+##### data/bcf_snps_duckweed.txt
+
+for plotting `venn_diagram_snp_filtering.R`
+
+##### data/charachter_matrix.csv
+
+charachter matrix for `fig_1_phylomaker.R` 
+
+##### data/combined_PC.csv
+
+data for `pc_stats.R`
+
+##### data/Conversion.R
+
+required for PCA plotting in `PCA_loop.R`
+
+##### data/gatk_snps_duckweed.txt
+
+for plotting `venn_diagram_snp_filtering.R`
+
+##### data/heterozygosity_csv/
+
+taxonomic dataset heterozygosity information for `heterozygosity_plots.R`
+
+##### data/input_bams.txt
+
+required bam names for mPileup
+
+##### data/interval.list
+
+required to generate for `Combine_gvcfs_and_genotype.sh` - include interval that SNPs were called for - use indexed reference file
+
+##### data/nodes_supported.csv
+
+data for `supported_nodes.R`
+
+##### data/POPSutilities.R
+
+required for PCA plotting
+
+##### data/samples.list
+
+required to generate for `Combine_gvcfs_and_genotype.sh` - include all samples that SNPs were called for
+
+##### data/SNPS_after_filtering.csv
+
+filtering data for `SNP_generation_filtering.R`
+
+##### data/structure_names.txt
+
+sample names for structure plots - used in `structure.R`
+
+##### data/taxon.nwk
+
+newick file for figure 1 - used in `fig_1_phylomaker.R`
