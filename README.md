@@ -1,6 +1,6 @@
 # The power to resolve relationships: identifying incongruence and precision of reduced representation and genome-wide data in phylogenomics and population genomics
 
-[doi here](https://doi.org/)
+[10.1101/2025.07.09.663802](https://doi.org/10.1101/2025.07.09.663802)
 
 ###### Corresponding Authors
 
