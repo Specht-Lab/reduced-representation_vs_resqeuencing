@@ -1,0 +1,1 @@
+Installed_programs/raxml-ng_v1.2.1/raxml-ng --all --msa Lotus_genome_LD_pruned_SNPs.recode.min4.fasta --msa-format FASTA --model GTGTR --prefix Lotus_genome_LD_pruned_SNPs --threads 16 --bs-trees 100 

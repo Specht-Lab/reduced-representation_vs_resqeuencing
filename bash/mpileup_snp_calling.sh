@@ -1,0 +1,1 @@
+Installed_programs/bcftools-1.19/bin/bcftools mpileup --threads 8 -f ../genomes/GCF_012489685.1_LjGifu_v1.2_genomic.fna --bam-list input_bams.txt | /local/workdir/jbl256/Installed_programs/bcftools-1.19/bin/bcftools call -m --variants-only --output-type z --output Lotus_genome_mpileup_unfiltered_snps.vcf.gz --threads 16

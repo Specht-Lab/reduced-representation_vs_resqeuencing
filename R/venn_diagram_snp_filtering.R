@@ -1,5 +1,5 @@
 #set wd, load packages, read files
-setwd("/Users/joshfelton/Desktop/mpileup_vs_GATK/")
+setwd("/Users/joshfelton/Library/CloudStorage/Box-Box/Specht Lab/Lab Members/Josh_Felton/manuscript/Dryad_supplamental_material/data")
 
 library(tidyverse)
 library(ggvenn) #install.packages("ggvenn")
