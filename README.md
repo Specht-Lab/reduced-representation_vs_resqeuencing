@@ -55,8 +55,8 @@ replicate our analyses.
 1. [table information](#table_information)
 2. [figures](#figures)
 3. [code](#code)
-  1. [shell](#shell_scripts)
-  2. [R](#R_scripts)
+  - [shell](#shell_scripts)
+  - [R](#R_scripts)
 4. [assoc. files (data)](#data)
 
 ## table information <a name="table_information"></a>
